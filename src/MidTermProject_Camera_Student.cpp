@@ -40,6 +40,8 @@ int main(int argc, const char *argv[])
     vector<DataFrame> dataBuffer; // list of data frames which are held in memory at the same time
     bool bVis = false;            // visualize results
 
+    uint8_t total_keypoints = 0;
+
     /* MAIN LOOP OVER ALL IMAGES */
 
     for (size_t imgIndex = 0; imgIndex <= imgEndIndex - imgStartIndex; imgIndex++)
@@ -77,7 +79,7 @@ int main(int argc, const char *argv[])
 
         // extract 2D keypoints from current image
         vector<cv::KeyPoint> keypoints; // create empty feature list for current image
-        string detectorType = "SHITOMASI";
+        string detectorType = "HARRIS";
 
         //// STUDENT ASSIGNMENT
         //// TASK MP.2 -> add the following keypoint detectors in file matching2D.cpp and enable string-based selection based on detectorType
@@ -106,8 +108,21 @@ int main(int argc, const char *argv[])
         cv::Rect vehicleRect(535, 180, 180, 150);
         if (bFocusOnVehicle)
         {
-            // ...
+            vector<cv::KeyPoint> keypoints_roi;
+            for(auto keypoint_iterate = keypoints.begin(); keypoint_iterate<keypoints.end(); keypoint_iterate++)
+            {
+                if(vehicleRect.contains(keypoint_iterate->pt))
+                {
+                    cv::KeyPoint tmp_point;
+                    tmp_point.pt = cv::Point2f(keypoint_iterate->pt);
+                    tmp_point.size = 1;
+                    keypoints_roi.push_back(tmp_point);
+                }
+            }
+            keypoints = keypoints_roi;
         }
+
+        total_keypoints += keypoints.size();
 
         //// EOF STUDENT ASSIGNMENT
 

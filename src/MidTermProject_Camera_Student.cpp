@@ -18,11 +18,53 @@
 
 using namespace std;
 
+#define LOGGING_KEYPOINTS (true)
+#define LOGGING_EXECUTION_TIME (true)
+
 /* MAIN PROGRAM */
 int main(int argc, const char *argv[])
 {
 
     /* INIT VARIABLES AND DATA STRUCTURES */
+    string detectorType = "HARRIS";
+    string descriptorType = "BRISK"; // BRIEF, ORB, FREAK, AKAZE, SIFT
+
+    if(argc == 1){
+        detectorType = "HARRIS";
+        descriptorType = "BRISK"; // BRIEF, ORB, FREAK, AKAZE, SIFT
+    }
+    else if(argc == 2){
+        detectorType = argv[1];
+    }
+    else if(argc == 3){
+        detectorType = argv[1];
+        descriptorType = argv[2];
+    }
+
+    std::cout << detectorType << std::endl;
+    std::cout << descriptorType << std::endl;
+
+    #if LOGGING_KEYPOINTS == true
+        string filename("../log/nb_of_keypoints.csv");
+        fstream file;
+        
+        file.open(filename, std::ios_base::app | std::ios_base::in);
+        if (file.is_open())
+        {
+            file << detectorType << ",";
+        }
+    #endif
+
+    #if LOGGING_KEYPOINTS == true
+        string filename("../log/nb_of_keypoints.csv");
+        fstream file;
+        
+        file.open(filename, std::ios_base::app | std::ios_base::in);
+        if (file.is_open())
+        {
+            file << detectorType << ",";
+        }
+    #endif
 
     // data location
     string dataPath = "../";
@@ -40,10 +82,9 @@ int main(int argc, const char *argv[])
     vector<DataFrame> dataBuffer; // list of data frames which are held in memory at the same time
     bool bVis = false;            // visualize results
 
-    uint8_t total_keypoints = 0;
+    uint32_t total_keypoints = 0;
 
     /* MAIN LOOP OVER ALL IMAGES */
-
     for (size_t imgIndex = 0; imgIndex <= imgEndIndex - imgStartIndex; imgIndex++)
     {
         /* LOAD IMAGE INTO BUFFER */
@@ -79,7 +120,6 @@ int main(int argc, const char *argv[])
 
         // extract 2D keypoints from current image
         vector<cv::KeyPoint> keypoints; // create empty feature list for current image
-        string detectorType = "HARRIS";
 
         //// STUDENT ASSIGNMENT
         //// TASK MP.2 -> add the following keypoint detectors in file matching2D.cpp and enable string-based selection based on detectorType
@@ -151,7 +191,6 @@ int main(int argc, const char *argv[])
         //// -> BRIEF, ORB, FREAK, AKAZE, SIFT
 
         cv::Mat descriptors;
-        string descriptorType = "BRISK"; // BRIEF, ORB, FREAK, AKAZE, SIFT
         descKeypoints((dataBuffer.end() - 1)->keypoints, (dataBuffer.end() - 1)->cameraImg, descriptors, descriptorType);
         //// EOF STUDENT ASSIGNMENT
 
@@ -186,7 +225,7 @@ int main(int argc, const char *argv[])
             cout << "#4 : MATCH KEYPOINT DESCRIPTORS done" << endl;
 
             // visualize matches between current and previous image
-            bVis = true;
+            bVis = false;
             if (bVis)
             {
                 cv::Mat matchImg = ((dataBuffer.end() - 1)->cameraImg).clone();
@@ -204,8 +243,11 @@ int main(int argc, const char *argv[])
             }
             bVis = false;
         }
-
     } // eof loop over all images
+
+    #if LOGGING_KEYPOINTS == true
+        file << total_keypoints << std::endl;
+    #endif
 
     return 0;
 }

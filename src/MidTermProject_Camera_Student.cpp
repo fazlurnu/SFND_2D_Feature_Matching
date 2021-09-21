@@ -18,7 +18,8 @@
 
 using namespace std;
 
-#define LOGGING_KEYPOINTS (true)
+#define LOGGING_KEYPOINTS (false)
+#define LOGGING_NB_OF_MATCHES (true)
 #define LOGGING_EXECUTION_TIME (true)
 
 /* MAIN PROGRAM */
@@ -28,6 +29,7 @@ int main(int argc, const char *argv[])
     /* INIT VARIABLES AND DATA STRUCTURES */
     string detectorType = "HARRIS";
     string descriptorType = "BRISK"; // BRIEF, ORB, FREAK, AKAZE, SIFT
+    string binary_or_hog;
 
     if(argc == 1){
         detectorType = "HARRIS";
@@ -41,30 +43,49 @@ int main(int argc, const char *argv[])
         descriptorType = argv[2];
     }
 
+    if(descriptorType == "SIFT")
+    {
+        binary_or_hog = "DES_HOG";
+    }
+    else{
+        binary_or_hog = "DES_BINARY";
+    }
+
     std::cout << detectorType << std::endl;
     std::cout << descriptorType << std::endl;
 
     #if LOGGING_KEYPOINTS == true
-        string filename("../log/nb_of_keypoints.csv");
-        fstream file;
+        string filename_keypoints("../log/nb_of_keypoints.csv");
+        fstream file_keypoints;
         
-        file.open(filename, std::ios_base::app | std::ios_base::in);
-        if (file.is_open())
+        file_keypoints.open(filename_keypoints, std::ios_base::app | std::ios_base::in);
+        if (file_keypoints.is_open())
         {
-            file << detectorType << ",";
+            file_keypoints << detectorType << ",";
         }
     #endif
 
-    // #if LOGGING_KEYPOINTS == true
-    //     string filename("../log/nb_of_keypoints.csv");
-    //     fstream file;
+    #if LOGGING_NB_OF_MATCHES == true
+        string filename_matches("../log/nb_of_matches.csv");
+        fstream file_matches;
         
-    //     file.open(filename, std::ios_base::app | std::ios_base::in);
-    //     if (file.is_open())
-    //     {
-    //         file << detectorType << ",";
-    //     }
-    // #endif
+        file_matches.open(filename_matches, std::ios_base::app | std::ios_base::in);
+        if (file_matches.is_open())
+        {
+            file_matches << detectorType << "/" << descriptorType << ",";
+        }
+    #endif
+
+    #if LOGGING_EXECUTION_TIME == true
+        string filename_execution_time("../log/execution_time.csv");
+        fstream file_execution_time;
+        
+        file_execution_time.open(filename_execution_time, std::ios_base::app | std::ios_base::in);
+        if (file_execution_time.is_open())
+        {
+            file_execution_time << detectorType << "/" << descriptorType << ",";
+        }
+    #endif
 
     // data location
     string dataPath = "../";
@@ -83,6 +104,9 @@ int main(int argc, const char *argv[])
     bool bVis = false;            // visualize results
 
     uint32_t total_keypoints = 0;
+    uint32_t nb_of_matches = 0;
+    double time_detector;
+    double time_descriptor;
 
     /* MAIN LOOP OVER ALL IMAGES */
     for (size_t imgIndex = 0; imgIndex <= imgEndIndex - imgStartIndex; imgIndex++)
@@ -127,15 +151,15 @@ int main(int argc, const char *argv[])
 
         if (detectorType.compare("SHITOMASI") == 0)
         {
-            detKeypointsShiTomasi(keypoints, imgGray, false);
+            time_detector = detKeypointsShiTomasi(keypoints, imgGray, false);
         }
         else if(detectorType.compare("HARRIS") == 0)
         {
-            detKeypointsHarris(keypoints, imgGray, false);
+            time_detector = detKeypointsHarris(keypoints, imgGray, false);
         }
         else
         {
-            detKeypointsModern(keypoints, imgGray, detectorType, false);
+            time_detector = detKeypointsModern(keypoints, imgGray, detectorType, false);
         }
 
         //// EOF STUDENT ASSIGNMENT
@@ -144,7 +168,7 @@ int main(int argc, const char *argv[])
         //// TASK MP.3 -> only keep keypoints on the preceding vehicle
 
         // only keep keypoints on the preceding vehicle
-        bool bFocusOnVehicle = true;
+        bool bFocusOnVehicle = false;
         cv::Rect vehicleRect(535, 180, 180, 150);
         if (bFocusOnVehicle)
         {
@@ -191,7 +215,7 @@ int main(int argc, const char *argv[])
         //// -> BRIEF, ORB, FREAK, AKAZE, SIFT
 
         cv::Mat descriptors;
-        descKeypoints((dataBuffer.end() - 1)->keypoints, (dataBuffer.end() - 1)->cameraImg, descriptors, descriptorType);
+        time_descriptor = descKeypoints((dataBuffer.end() - 1)->keypoints, (dataBuffer.end() - 1)->cameraImg, descriptors, descriptorType);
         //// EOF STUDENT ASSIGNMENT
 
         // push descriptors for current frame to end of data buffer
@@ -208,21 +232,21 @@ int main(int argc, const char *argv[])
             string matcherType = "MAT_BF";        // MAT_BF, MAT_FLANN
             string descriptorType = "DES_BINARY"; // DES_BINARY, DES_HOG
             string selectorType = "SEL_KNN";       // SEL_NN, SEL_KNN
-
+            
             //// STUDENT ASSIGNMENT
             //// TASK MP.5 -> add FLANN matching in file matching2D.cpp
             //// TASK MP.6 -> add KNN match selection and perform descriptor distance ratio filtering with t=0.8 in file matching2D.cpp
 
-            matchDescriptors((dataBuffer.end() - 2)->keypoints, (dataBuffer.end() - 1)->keypoints,
-                             (dataBuffer.end() - 2)->descriptors, (dataBuffer.end() - 1)->descriptors,
-                             matches, descriptorType, matcherType, selectorType);
+            nb_of_matches = matchDescriptors((dataBuffer.end() - 2)->keypoints, (dataBuffer.end() - 1)->keypoints,
+                                            (dataBuffer.end() - 2)->descriptors, (dataBuffer.end() - 1)->descriptors,
+                                            matches, binary_or_hog, matcherType, selectorType);
 
             //// EOF STUDENT ASSIGNMENT
 
             // store matches in current data frame
             (dataBuffer.end() - 1)->kptMatches = matches;
 
-            cout << "#4 : MATCH KEYPOINT DESCRIPTORS done" << endl;
+            cout << "#4 : MATCH KEYPOINT DESCRIPTORS done, number of matches " << nb_of_matches << endl;
 
             // visualize matches between current and previous image
             bVis = false;
@@ -246,7 +270,15 @@ int main(int argc, const char *argv[])
     } // eof loop over all images
 
     #if LOGGING_KEYPOINTS == true
-        file << total_keypoints << std::endl;
+        file_keypoints << total_keypoints << std::endl;
+    #endif
+
+    #if LOGGING_NB_OF_MATCHES == true
+        file_matches << nb_of_matches << std::endl;
+    #endif
+
+    #if LOGGING_NB_OF_MATCHES == true
+        file_execution_time << time_detector + time_descriptor << std::endl;
     #endif
 
     return 0;

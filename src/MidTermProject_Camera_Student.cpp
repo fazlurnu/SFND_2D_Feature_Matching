@@ -55,16 +55,16 @@ int main(int argc, const char *argv[])
         }
     #endif
 
-    #if LOGGING_KEYPOINTS == true
-        string filename("../log/nb_of_keypoints.csv");
-        fstream file;
+    // #if LOGGING_KEYPOINTS == true
+    //     string filename("../log/nb_of_keypoints.csv");
+    //     fstream file;
         
-        file.open(filename, std::ios_base::app | std::ios_base::in);
-        if (file.is_open())
-        {
-            file << detectorType << ",";
-        }
-    #endif
+    //     file.open(filename, std::ios_base::app | std::ios_base::in);
+    //     if (file.is_open())
+    //     {
+    //         file << detectorType << ",";
+    //     }
+    // #endif
 
     // data location
     string dataPath = "../";
@@ -207,7 +207,7 @@ int main(int argc, const char *argv[])
             vector<cv::DMatch> matches;
             string matcherType = "MAT_BF";        // MAT_BF, MAT_FLANN
             string descriptorType = "DES_BINARY"; // DES_BINARY, DES_HOG
-            string selectorType = "SEL_NN";       // SEL_NN, SEL_KNN
+            string selectorType = "SEL_KNN";       // SEL_NN, SEL_KNN
 
             //// STUDENT ASSIGNMENT
             //// TASK MP.5 -> add FLANN matching in file matching2D.cpp

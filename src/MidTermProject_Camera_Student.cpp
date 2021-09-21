@@ -19,7 +19,7 @@
 using namespace std;
 
 #define LOGGING_KEYPOINTS (false)
-#define LOGGING_NB_OF_MATCHES (true)
+#define LOGGING_NB_OF_MATCHES (false)
 #define LOGGING_EXECUTION_TIME (true)
 
 /* MAIN PROGRAM */
@@ -105,8 +105,8 @@ int main(int argc, const char *argv[])
 
     uint32_t total_keypoints = 0;
     uint32_t nb_of_matches = 0;
-    double time_detector;
-    double time_descriptor;
+    double time_detector = 0;
+    double time_descriptor = 0;
 
     /* MAIN LOOP OVER ALL IMAGES */
     for (size_t imgIndex = 0; imgIndex <= imgEndIndex - imgStartIndex; imgIndex++)
@@ -151,15 +151,15 @@ int main(int argc, const char *argv[])
 
         if (detectorType.compare("SHITOMASI") == 0)
         {
-            time_detector = detKeypointsShiTomasi(keypoints, imgGray, false);
+            time_detector += detKeypointsShiTomasi(keypoints, imgGray, false);
         }
         else if(detectorType.compare("HARRIS") == 0)
         {
-            time_detector = detKeypointsHarris(keypoints, imgGray, false);
+            time_detector += detKeypointsHarris(keypoints, imgGray, false);
         }
         else
         {
-            time_detector = detKeypointsModern(keypoints, imgGray, detectorType, false);
+            time_detector += detKeypointsModern(keypoints, imgGray, detectorType, false);
         }
 
         //// EOF STUDENT ASSIGNMENT
@@ -215,7 +215,7 @@ int main(int argc, const char *argv[])
         //// -> BRIEF, ORB, FREAK, AKAZE, SIFT
 
         cv::Mat descriptors;
-        time_descriptor = descKeypoints((dataBuffer.end() - 1)->keypoints, (dataBuffer.end() - 1)->cameraImg, descriptors, descriptorType);
+        time_descriptor += descKeypoints((dataBuffer.end() - 1)->keypoints, (dataBuffer.end() - 1)->cameraImg, descriptors, descriptorType);
         //// EOF STUDENT ASSIGNMENT
 
         // push descriptors for current frame to end of data buffer
@@ -277,7 +277,7 @@ int main(int argc, const char *argv[])
         file_matches << nb_of_matches << std::endl;
     #endif
 
-    #if LOGGING_NB_OF_MATCHES == true
+    #if LOGGING_EXECUTION_TIME == true
         file_execution_time << time_detector + time_descriptor << std::endl;
     #endif
 

@@ -13,24 +13,40 @@ void matchDescriptors(std::vector<cv::KeyPoint> &kPtsSource, std::vector<cv::Key
 
     if (matcherType.compare("MAT_BF") == 0)
     {
-        int normType = cv::NORM_HAMMING;
+        int normType = descriptorType.compare("DES_BINARY") == 0 ? cv::NORM_HAMMING : cv::NORM_L2;
         matcher = cv::BFMatcher::create(normType, crossCheck);
+        cout << "BF matching cross-check=" << crossCheck;
     }
     else if (matcherType.compare("MAT_FLANN") == 0)
     {
-        // ...
+        if (descSource.type() != CV_32F)
+        { // OpenCV bug workaround : convert binary descriptors to floating point due to a bug in current OpenCV implementation
+            descSource.convertTo(descSource, CV_32F);
+            descRef.convertTo(descRef, CV_32F);
+        }
+
+        matcher = cv::DescriptorMatcher::create(cv::DescriptorMatcher::FLANNBASED);
+        cout << "FLANN matching";
     }
 
     // perform matching task
+    double t = (double)cv::getTickCount();
+
     if (selectorType.compare("SEL_NN") == 0)
     { // nearest neighbor (best match)
 
         matcher->match(descSource, descRef, matches); // Finds the best match for each descriptor in desc1
+        
+        t = ((double)cv::getTickCount() - t) / cv::getTickFrequency();
+        cout << " (NN) with n=" << matches.size() << " matches in " << 1000 * t / 1.0 << " ms" << endl;
     }
     else if (selectorType.compare("SEL_KNN") == 0)
     { // k nearest neighbors (k=2)
+        vector<vector<cv::DMatch>> knn_matches;
+        matcher->knnMatch(descSource, descRef, knn_matches, 2); // finds the 2 best matches
 
-        // ...
+        t = ((double)cv::getTickCount() - t) / cv::getTickFrequency();
+        cout << " (KNN) with n=" << knn_matches.size() << " matches in " << 1000 * t / 1.0 << " ms" << endl;
     }
 }
 
@@ -67,7 +83,7 @@ void descKeypoints(vector<cv::KeyPoint> &keypoints, cv::Mat &img, cv::Mat &descr
     }
     else
     {
-        std::cout << "Invalid keypoints descriptor.\n";
+        std::cout << "Invalid keypoints descriptor." << std::endl;
     }
 
     // perform feature description

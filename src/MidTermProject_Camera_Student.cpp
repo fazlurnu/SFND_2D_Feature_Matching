@@ -129,13 +129,14 @@ int main(int argc, const char *argv[])
         // push image into data frame buffer
         DataFrame frame;
         frame.cameraImg = imgGray;
-        dataBuffer.push_back(frame);
 
         // keep size of dataBuffer equals to dataBufferSize by erasing the first element
         if (dataBuffer.size() > dataBufferSize)
         {
             dataBuffer.erase(dataBuffer.begin());
         }
+
+        dataBuffer.push_back(frame);
 
         //// EOF STUDENT ASSIGNMENT
         cout << "#1 : LOAD IMAGE INTO BUFFER done" << endl;

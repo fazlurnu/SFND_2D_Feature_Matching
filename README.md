@@ -41,7 +41,31 @@ Then, add *C:\vcpkg\installed\x64-windows\bin* and *C:\vcpkg\installed\x64-windo
 3. Compile: `cmake .. && make`
 4. Run it: `./2D_feature_tracking`.
 
-## Benchmarking
+## Report
+### MP.1 Data Buffer Optimization
+To keep the data buffer size constant, one needs to remove the first element before adding a new data if the number of element is equal to the maximum desired data buffer size. This is called ring data buffer. Since the data buffer is a vector, one can use `erase` to delete an element. The implementation is written as follows:
+```cpp
+  // keep size of dataBuffer equals to dataBufferSize by erasing the first element
+  if (dataBuffer.size() > dataBufferSize)
+  {
+      dataBuffer.erase(dataBuffer.begin());
+  }
+
+  dataBuffer.push_back(frame);
+```
+
+### MP.2 Keypoint Detection
+The detector HARRIS, FAST, BRISK, ORB, AKAZE, and SIFT are implemented based on the `detectorType` variable. The `detectorType` can be assigned from the `terminal input argument`, for instance user can execute `./2D_feature_tracking detectorType descriptorType`. If the `detectorType` is HARRIS, then HARRIS detector is selected, the implementation is written in `matching2D_Student.cpp`. If FAST, BRISK, ORB, AKAZE, or SIFT is selected, then function `detKeypointsModern` is called and the detector is selected accordingly. Note that for SIFT one needs to change the descriptor type as HOG instead of binary.
+
+Each detector function return the execution time which will be used for MP.9.
+
+### MP.3 Keypoint Removal
+To focus on the determined vehicle, one needs to check if a point is contained within the region of intereset (ROI). To do so, a new vector `keypoints_roi` is created to store the points contained in the ROI. The ROI is determiend as `vehicleRect` variable, to check if the heypoint is in the ROI, one can use `vehicleRect.contains`. If the condition is true, than the point as appended to `keypoints_roi`.
+
+### MP.9 Performance
+Implement detectors  and make them selectable by setting a
+string accordingly.
+
 I modified functions in the `MidTermProject_Camera_Student.cpp` to log the data.
 The result of MP7 can be found in `log/nb_of_keypoints.csv`.
 The result of MP8 can be found in `log/nb_of_mathces.csv`.

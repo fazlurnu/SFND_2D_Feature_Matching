@@ -50,8 +50,9 @@ The result of MP9 can be found in `log/execution_time.csv`.
 I created shell scripts in folder `build` to run the executable file for different detector and descriptor.
 
 Based on the exectuion time, the best detector/descriptor pair are:
-1. FAST/BRIEF
-2. FAST/ORB
-3. ORB/BRISK
-
+|Sr. No. | Detector + Descriptor |Total Keypoints |Total Matches |Total Time (ms) |
+|:---:|:---:|:----:|:-----:|:-----:|
+|1 | FAST + BRIEF |1491 |1222 |139.7	|
+|2 | FAST + ORB |1491 |1132 |171.13 |
+|3 | ORB + BRISK |1161 | 313 |280.2 |
 

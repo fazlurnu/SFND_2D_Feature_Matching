@@ -20,10 +20,9 @@ See the classroom instruction and code comments for more details on each of thes
  * Mac: [install Xcode command line tools to get make](https://developer.apple.com/xcode/features/)
  * Windows: [Click here for installation instructions](http://gnuwin32.sourceforge.net/packages/make.htm)
 
-3. OpenCV >= 4.1
+3. OpenCV >= 4.5
  * All OSes: refer to the [official instructions](https://docs.opencv.org/master/df/d65/tutorial_table_of_content_introduction.html)
  * This must be compiled from source using the `-D OPENCV_ENABLE_NONFREE=ON` cmake flag for testing the SIFT and SURF detectors. If using [homebrew](https://brew.sh/): `$> brew install --build-from-source opencv` will install required dependencies and compile opencv with the `opencv_contrib` module by default (no need to set `-DOPENCV_ENABLE_NONFREE=ON` manually). 
- * The OpenCV 4.1.0 source code can be found [here](https://github.com/opencv/opencv/tree/4.1.0)
 
 4. gcc/g++ >= 5.4
   * Linux: gcc / g++ is installed by default on most Linux distros
@@ -41,3 +40,18 @@ Then, add *C:\vcpkg\installed\x64-windows\bin* and *C:\vcpkg\installed\x64-windo
 2. Make a build directory in the top level directory: `mkdir build && cd build`
 3. Compile: `cmake .. && make`
 4. Run it: `./2D_feature_tracking`.
+
+## Benchmarking
+I modified functions in the `MidTermProject_Camera_Student.cpp` to log the data.
+The result of MP7 can be found in `log/nb_of_keypoints.csv`.
+The result of MP8 can be found in `log/nb_of_mathces.csv`.
+The result of MP9 can be found in `log/execution_time.csv`.
+
+I created shell scripts in folder `build` to run the executable file for different detector and descriptor.
+
+Based on the exectuion time, the best detector/descriptor pair are:
+1. FAST/BRIEF
+2. FAST/ORB
+3. ORB/BRISK
+
+

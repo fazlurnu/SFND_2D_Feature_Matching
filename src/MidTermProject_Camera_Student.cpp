@@ -19,8 +19,8 @@
 using namespace std;
 
 #define LOGGING_KEYPOINTS (false)
-#define LOGGING_NB_OF_MATCHES (false)
-#define LOGGING_EXECUTION_TIME (true)
+#define LOGGING_NB_OF_MATCHES (true)
+#define LOGGING_EXECUTION_TIME (false)
 
 /* MAIN PROGRAM */
 int main(int argc, const char *argv[])
@@ -237,7 +237,7 @@ int main(int argc, const char *argv[])
             //// TASK MP.5 -> add FLANN matching in file matching2D.cpp
             //// TASK MP.6 -> add KNN match selection and perform descriptor distance ratio filtering with t=0.8 in file matching2D.cpp
 
-            nb_of_matches = matchDescriptors((dataBuffer.end() - 2)->keypoints, (dataBuffer.end() - 1)->keypoints,
+            nb_of_matches += matchDescriptors((dataBuffer.end() - 2)->keypoints, (dataBuffer.end() - 1)->keypoints,
                                             (dataBuffer.end() - 2)->descriptors, (dataBuffer.end() - 1)->descriptors,
                                             matches, binary_or_hog, matcherType, selectorType);
 

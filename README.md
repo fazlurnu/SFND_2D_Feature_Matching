@@ -97,6 +97,6 @@ One can choose number of matches divided by execution time as a performance eval
 |2 | FAST + ORB |1491 |10478 |171.1 |
 |3 | FAST + BRISK |1491 |8742 |422.8 |
 
-One should note that some detector cannot match `AKAZE` for the descriptor due to difference in method.
+One should note that some detector cannot match `AKAZE` for the descriptor due to difference in method. Also, the SIFT + ORB pair data is not available since the pair makes my computer out of memory.
 
 

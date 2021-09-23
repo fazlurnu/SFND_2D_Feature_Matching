@@ -81,10 +81,12 @@ The number of keypoint on the region of interest (ROI) is assigned to `total_key
 
 The number of matches on all the image is assigned to `nb_of_matches`. The number of matches is then recorded to a file `log/nb_of_matches.csv` if `LOGGING_NB_OF_MATCHES` is set to `TRUE`. The file stores the keypoint detector and descriptor pair as well as the number of matches.
 
-
+<img src="images/nb_of_matches..png"/>
 
 ### MP.9 Performance Evaluation 3 - Execution Time
 The execution time is calculated from the `time_detector` and `time_descriptor` which is returned by the keypoint detector and descriptor function. The number of matches is then recorded to a file `log/execution_time.csv` if `LOGGING_EXECUTION_TIME` is set to `TRUE`. The file stores the keypoint detector and descriptor pair as well as the execution time.
+
+<img src="images/execution_time.png"/>
 
 ### Top Three Detector Descriptor Pair
 One can choose number of matches divided by execution time as a performance evaluation. This describes the keypoints pair and how fast the process is calculated. Based on this criteria, the best pair is shown below:

@@ -62,21 +62,39 @@ Each detector function return the execution time which will be used for MP.9.
 ### MP.3 Keypoint Removal
 To focus on the determined vehicle, one needs to check if a point is contained within the region of intereset (ROI). To do so, a new vector `keypoints_roi` is created to store the points contained in the ROI. The ROI is determiend as `vehicleRect` variable, to check if the heypoint is in the ROI, one can use `vehicleRect.contains`. If the condition is true, than the point as appended to `keypoints_roi`.
 
-### MP.9 Performance
-Implement detectors  and make them selectable by setting a
-string accordingly.
+### MP.4 Keypoint Descriptor
+The `BRIEF, ORB, FREAK, AKAZE`, and `SIFT` descriptors are implemented based on the `descriptorType` variable. The `descriptorType` can be assigned from the `terminal input argument`, for instance user can execute `./2D_feature_tracking detectorType descriptorType`. The function `descKeypoints` at line 66 in`matching2D_Student.cpp` uses several `if` condition which is used to check which descriptor type the user wants to use. The execution time is returned by the function for MP.9 logging purpose.
 
-I modified functions in the `MidTermProject_Camera_Student.cpp` to log the data.
-The result of MP7 can be found in `log/nb_of_keypoints.csv`.
-The result of MP8 can be found in `log/nb_of_mathces.csv`.
-The result of MP9 can be found in `log/execution_time.csv`.
+### MP.5 Descriptor Matching
+`FLANN` matching is implemented at line 20 in `matching2D_Student.cpp`. The `matcher` is created based on `cv::DescriptorMatcher::FLANNBASED`. User can select between `Brute Force` method or `FLANN Based` method by assigning the type to `matcherType` variable.
+The selector type can be chosen between `NN` or `KNN` method by assigning the type into `selectorType` variable. For this particular task, 2 nearest neighbor is selected.
 
-I created shell scripts in folder `build` to run the executable file for different detector and descriptor.
+### MP.6 Descriptor Distance Ratio
 
-Based on the exectuion time, the best detector/descriptor pair are:
+Each match from the `knn_matches` vector is tested to check the distance. If the distance is less than `minDescDistRatio`, which is set to 0.8, the pair is appended to `matches` vector and the `matches` size is returned at the end of the function for MP.8 purpose.
+
+### MP.7 Performance Evaluation 1 - Number of Keypoint
+
+The number of keypoint on the region of interest (ROI) is assigned to `total_keypoints`. The number of keypoint is then recorded to a file `log/nb_of_keypoints.csv` if `LOGGING_KEYPOINTS` is set to `TRUE`. The file stores the keypoint detector type and number of keypoints deteted.
+
+### MP.8 Performance Evaluation 2 - Number of Matches
+
+The number of matches on all the image is assigned to `nb_of_matches`. The number of matches is then recorded to a file `log/nb_of_matches.csv` if `LOGGING_NB_OF_MATCHES` is set to `TRUE`. The file stores the keypoint detector and descriptor pair as well as the number of matches.
+
+
+
+### MP.9 Performance Evaluation 3 - Execution Time
+The execution time is calculated from the `time_detector` and `time_descriptor` which is returned by the keypoint detector and descriptor function. The number of matches is then recorded to a file `log/execution_time.csv` if `LOGGING_EXECUTION_TIME` is set to `TRUE`. The file stores the keypoint detector and descriptor pair as well as the execution time.
+
+### Top Three Detector Descriptor Pair
+One can choose number of matches divided by execution time as a performance evaluation. This describes the keypoints pair and how fast the process is calculated. Based on this criteria, the best pair is shown below:
+
 |Sr. No. | Detector + Descriptor |Total Keypoints |Total Matches |Total Time (ms) |
 |:---:|:---:|:----:|:-----:|:-----:|
-|1 | FAST + BRIEF |1491 |1222 |139.7	|
-|2 | FAST + ORB |1491 |1132 |171.13 |
-|3 | ORB + BRISK |1161 | 313 |280.2 |
+|1 | FAST + BRIEF |1491 |11261 |139.7 |
+|2 | FAST + ORB |1491 |10478 |171.1 |
+|3 | FAST + BRISK |1491 |8742 |422.8 |
+
+One should note that some detector cannot match `AKAZE` for the descriptor due to difference in method.
+
 
